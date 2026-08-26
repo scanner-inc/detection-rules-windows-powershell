@@ -1,0 +1,12 @@
+# schema: https://scanner.dev/schema/scanner-detection-rule.v1.json
+name: "HackTool - Evil-WinRm Execution - PowerShell Module"
+description: "Detects the execution of Evil-WinRM via PowerShell Module logs by leveraging the hardcoded strings inside the utility."
+severity: High
+query_text: |
+  (((Event.EventData.ContextInfo:":\\Windows\\System32\\wsmprovhost.exe" or Event.EventData.ContextInfo:":\\Windows\\SysWOW64\\wsmprovhost.exe")) and ((Event.EventData.Payload:"value=\"(get-location).path" or Event.EventData.Payload:"value=\"(get-item*).length" or Event.EventData.Payload:"Invoke-Binary " or Event.EventData.Payload:"Donut-Loader -process_id*-donutfile" or Event.EventData.Payload:"Bypass-4MSI" or Event.EventData.Payload:"IEX ([System.Text.Encoding]::ASCII.GetString([System.Convert]::FromBase64String($a))).replace('???','')") or (Event.EventData.Payload:"$servicios = Get-ItemProperty \"registry::HKLM\\System\\CurrentControlSet\\Services\\\"" and Event.EventData.Payload:"Where-Object {$_.imagepath -notmatch \"system\" -and $_.imagepath -ne $null } | Select-Object pschildname,imagepath") or (Event.EventData.Payload:"$a +=  \\\"$($_.FullName.Replace('\\\\','/'))/\\\"}else{  $a += \\\"$($_.FullName.Replace('\\\\', '/'))\\\" }" and Event.EventData.Payload:"$a=@();$")))
+time_range_s: 600
+run_frequency_s: 300
+event_sink_keys:
+  - "high_severity_alerts"
+tags:
+  - "attack.lateral-movement"

@@ -1,0 +1,15 @@
+# schema: https://scanner.dev/schema/scanner-detection-rule.v1.json
+name: "Renamed Powershell Under Powershell Channel"
+description: "Detects a renamed Powershell execution, which is a common technique used to circumvent security controls and bypass detection logic that's dependent on process names and process paths."
+severity: Low
+query_text: |
+  ((Event.EventData.Data:"HostName=ConsoleHost") and not ((Event.EventData.Data:"HostApplication=powershell" or Event.EventData.Data:"HostApplication=C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\powershell" or Event.EventData.Data:"HostApplication=C:\\Windows\\SysWOW64\\WindowsPowerShell\\v1.0\\powershell" or Event.EventData.Data:"HostApplication=C:/Windows/System32/WindowsPowerShell/v1.0/powershell" or Event.EventData.Data:"HostApplication=C:/Windows/SysWOW64/WindowsPowerShell/v1.0/powershell" or Event.EventData.Data:"HostApplication=C:\\\\\\\\WINDOWS\\\\\\\\system32\\\\\\\\WindowsPowerShell\\\\\\\\v1.0\\\\\\\\powershell.exe" or Event.EventData.Data:"HostApplication=C:\\\\\\\\WINDOWS\\\\\\\\SysWOW64\\\\\\\\WindowsPowerShell\\\\\\\\v1.0\\\\\\\\powershell.exe")))
+time_range_s: 600
+run_frequency_s: 300
+event_sink_keys:
+  - "low_severity_alerts"
+tags:
+  - "attack.execution"
+  - "attack.stealth"
+  - "attack.t1059.001"
+  - "attack.t1036.003"

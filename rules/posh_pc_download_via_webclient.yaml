@@ -1,0 +1,15 @@
+# schema: https://scanner.dev/schema/scanner-detection-rule.v1.json
+name: "PowerShell Download Via Net.WebClient - PowerShell Classic"
+description: "Detects PowerShell download activity, via the .DownloadFile() or .DownloadString() methods of the Net.WebClient class.\nThis technique is often abused by attackers to download additional payloads."
+severity: Low
+query_text: |
+  (((Event.EventData.Data:".DownloadFile(" or Event.EventData.Data:".DownloadString(") and Event.EventData.Data:"Net.WebClient"))
+time_range_s: 600
+run_frequency_s: 300
+event_sink_keys:
+  - "low_severity_alerts"
+tags:
+  - "attack.execution"
+  - "attack.command-and-control"
+  - "attack.t1059.001"
+  - "attack.t1105"

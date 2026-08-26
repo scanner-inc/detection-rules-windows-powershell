@@ -1,0 +1,13 @@
+# schema: https://scanner.dev/schema/scanner-detection-rule.v1.json
+name: "Use Get-NetTCPConnection"
+description: "Adversaries may attempt to get a listing of network connections to or from the compromised system they are currently accessing or from remote systems by querying for information over the network."
+severity: Low
+query_text: |
+  ((Event.EventData.Data:"Get-NetTCPConnection"))
+time_range_s: 600
+run_frequency_s: 300
+event_sink_keys:
+  - "low_severity_alerts"
+tags:
+  - "attack.discovery"
+  - "attack.t1049"

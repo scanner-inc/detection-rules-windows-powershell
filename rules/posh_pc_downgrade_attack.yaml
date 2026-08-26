@@ -1,0 +1,13 @@
+# schema: https://scanner.dev/schema/scanner-detection-rule.v1.json
+name: "PowerShell Downgrade Attack - PowerShell"
+description: "Detects PowerShell downgrade attack by comparing the host versions with the actually used engine version 2.0"
+severity: Medium
+query_text: |
+  ((Event.EventData.Data:"EngineVersion=2.") and not (Event.EventData.Data:"HostVersion=2."))
+time_range_s: 600
+run_frequency_s: 300
+event_sink_keys:
+  - "medium_severity_alerts"
+tags:
+  - "attack.execution"
+  - "attack.t1059.001"

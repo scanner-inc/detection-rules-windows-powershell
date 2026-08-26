@@ -1,0 +1,15 @@
+# schema: https://scanner.dev/schema/scanner-detection-rule.v1.json
+name: "Remote PowerShell Session (PS Module)"
+description: "Detects remote PowerShell sessions"
+severity: High
+query_text: |
+  (((Event.EventData.ContextInfo:" = ServerRemoteHost " and Event.EventData.ContextInfo:"wsmprovhost.exe")) and not (Event.EventData.ContextInfo:"\\Windows\\system32\\WindowsPowerShell\\v1.0\\Modules\\Microsoft.PowerShell.Archive\\Microsoft.PowerShell.Archive.psm1"))
+time_range_s: 600
+run_frequency_s: 300
+event_sink_keys:
+  - "high_severity_alerts"
+tags:
+  - "attack.execution"
+  - "attack.t1059.001"
+  - "attack.lateral-movement"
+  - "attack.t1021.006"

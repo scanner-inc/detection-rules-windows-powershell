@@ -1,0 +1,15 @@
+# schema: https://scanner.dev/schema/scanner-detection-rule.v1.json
+name: "Remote PowerShell Session (PS Classic)"
+description: "Detects remote PowerShell sessions"
+severity: Low
+query_text: |
+  (((Event.EventData.Data:"HostName=ServerRemoteHost" and Event.EventData.Data:"wsmprovhost.exe")))
+time_range_s: 600
+run_frequency_s: 300
+event_sink_keys:
+  - "low_severity_alerts"
+tags:
+  - "attack.execution"
+  - "attack.t1059.001"
+  - "attack.lateral-movement"
+  - "attack.t1021.006"

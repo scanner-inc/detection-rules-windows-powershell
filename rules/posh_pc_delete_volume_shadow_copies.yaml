@@ -1,0 +1,13 @@
+# schema: https://scanner.dev/schema/scanner-detection-rule.v1.json
+name: "Delete Volume Shadow Copies Via WMI With PowerShell"
+description: "Shadow Copies deletion using operating systems utilities via PowerShell"
+severity: High
+query_text: |
+  ((((Event.EventData.Data:"Get-WmiObject" and Event.EventData.Data:Win32_ShadowCopy) and (Event.EventData.Data:"Delete()" or Event.EventData.Data:"Remove-WmiObject"))))
+time_range_s: 600
+run_frequency_s: 300
+event_sink_keys:
+  - "high_severity_alerts"
+tags:
+  - "attack.impact"
+  - "attack.t1490"

@@ -1,0 +1,13 @@
+# schema: https://scanner.dev/schema/scanner-detection-rule.v1.json
+name: "Suspicious PowerShell Download - PoshModule"
+description: "Detects suspicious PowerShell download command"
+severity: Medium
+query_text: |
+  (((Event.EventData.ContextInfo:".DownloadFile(" or Event.EventData.ContextInfo:".DownloadString(") and Event.EventData.ContextInfo:"System.Net.WebClient"))
+time_range_s: 600
+run_frequency_s: 300
+event_sink_keys:
+  - "medium_severity_alerts"
+tags:
+  - "attack.execution"
+  - "attack.t1059.001"

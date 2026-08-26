@@ -1,0 +1,13 @@
+# schema: https://scanner.dev/schema/scanner-detection-rule.v1.json
+name: "Windows Firewall Profile Disabled"
+description: "Detects when a user disables the Windows Firewall via a Profile to help evade defense."
+severity: Medium
+query_text: |
+  (((Event.EventData.ScriptBlockText:"Set-NetFirewallProfile " and Event.EventData.ScriptBlockText:" -Enabled " and Event.EventData.ScriptBlockText:" False") and (Event.EventData.ScriptBlockText:" -All " or Event.EventData.ScriptBlockText:Public or Event.EventData.ScriptBlockText:Domain or Event.EventData.ScriptBlockText:Private)))
+time_range_s: 600
+run_frequency_s: 300
+event_sink_keys:
+  - "medium_severity_alerts"
+tags:
+  - "attack.defense-impairment"
+  - "attack.t1686.003"

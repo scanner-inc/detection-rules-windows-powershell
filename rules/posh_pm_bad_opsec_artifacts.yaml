@@ -1,0 +1,13 @@
+# schema: https://scanner.dev/schema/scanner-detection-rule.v1.json
+name: "Bad Opsec Powershell Code Artifacts"
+description: "focuses on trivial artifacts observed in variants of prevalent offensive ps1 payloads, including\nCobalt Strike Beacon, PoshC2, Powerview, Letmein, Empire, Powersploit, and other attack payloads\nthat often undergo minimal changes by attackers due to bad opsec."
+severity: Critical
+query_text: |
+  (((Event.EventData.Payload:"$DoIt" or Event.EventData.Payload:harmj0y or Event.EventData.Payload:mattifestation or Event.EventData.Payload:_RastaMouse or Event.EventData.Payload:tifkin_ or Event.EventData.Payload:0xdeadbeef)))
+time_range_s: 600
+run_frequency_s: 300
+event_sink_keys:
+  - "critical_severity_alerts"
+tags:
+  - "attack.execution"
+  - "attack.t1059.001"

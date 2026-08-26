@@ -1,0 +1,13 @@
+# schema: https://scanner.dev/schema/scanner-detection-rule.v1.json
+name: "Nslookup PowerShell Download Cradle"
+description: "Detects a powershell download cradle using nslookup. This cradle uses nslookup to extract payloads from DNS records."
+severity: Medium
+query_text: |
+  ((((Event.EventData.Data:powershell and Event.EventData.Data:nslookup and Event.EventData.Data:"[1]") and (Event.EventData.Data:"-q=txt http" or Event.EventData.Data:"-querytype=txt http" or Event.EventData.Data:"-type=txt http"))))
+time_range_s: 600
+run_frequency_s: 300
+event_sink_keys:
+  - "medium_severity_alerts"
+tags:
+  - "attack.execution"
+  - "attack.t1059.001"

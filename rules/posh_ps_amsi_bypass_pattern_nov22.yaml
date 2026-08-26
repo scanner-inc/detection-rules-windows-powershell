@@ -1,0 +1,14 @@
+# schema: https://scanner.dev/schema/scanner-detection-rule.v1.json
+name: "AMSI Bypass Pattern Assembly GetType"
+description: "Detects code fragments found in small and obfuscated AMSI bypass PowerShell scripts"
+severity: High
+query_text: |
+  (((Event.EventData.ScriptBlockText:"[Ref].Assembly.GetType" and Event.EventData.ScriptBlockText:"SetValue($null,$true)" and Event.EventData.ScriptBlockText:"NonPublic,Static")))
+time_range_s: 600
+run_frequency_s: 300
+event_sink_keys:
+  - "high_severity_alerts"
+tags:
+  - "attack.defense-impairment"
+  - "attack.t1685"
+  - "attack.execution"

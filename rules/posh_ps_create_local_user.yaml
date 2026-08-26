@@ -1,0 +1,15 @@
+# schema: https://scanner.dev/schema/scanner-detection-rule.v1.json
+name: "PowerShell Create Local User"
+description: "Detects creation of a local user via PowerShell"
+severity: Medium
+query_text: |
+  ((Event.EventData.ScriptBlockText:"New-LocalUser"))
+time_range_s: 600
+run_frequency_s: 300
+event_sink_keys:
+  - "medium_severity_alerts"
+tags:
+  - "attack.execution"
+  - "attack.t1059.001"
+  - "attack.persistence"
+  - "attack.t1136.001"

@@ -1,0 +1,13 @@
+# schema: https://scanner.dev/schema/scanner-detection-rule.v1.json
+name: "Get-ADUser Enumeration Using UserAccountControl Flags"
+description: "Detects AS-REP roasting is an attack that is often-overlooked. It is not very common as you have to explicitly set accounts that do not require pre-authentication."
+severity: Medium
+query_text: |
+  (((Event.EventData.ScriptBlockText:"Get-ADUser" and Event.EventData.ScriptBlockText:"-Filter" and Event.EventData.ScriptBlockText:useraccountcontrol and Event.EventData.ScriptBlockText:"-band" and Event.EventData.ScriptBlockText:4194304)))
+time_range_s: 600
+run_frequency_s: 300
+event_sink_keys:
+  - "medium_severity_alerts"
+tags:
+  - "attack.discovery"
+  - "attack.t1033"

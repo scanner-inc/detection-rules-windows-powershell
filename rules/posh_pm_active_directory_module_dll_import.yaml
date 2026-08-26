@@ -1,0 +1,14 @@
+# schema: https://scanner.dev/schema/scanner-detection-rule.v1.json
+name: "Potential Active Directory Enumeration Using AD Module - PsModule"
+description: "Detects usage of the \"Import-Module\" cmdlet to load the \"Microsoft.ActiveDirectory.Management.dl\" DLL. Which is often used by attackers to perform AD enumeration."
+severity: Medium
+query_text: |
+  (((Event.EventData.Payload:"Import-Module " or Event.EventData.Payload:"ipmo ") and Event.EventData.Payload:"Microsoft.ActiveDirectory.Management.dll"))
+time_range_s: 600
+run_frequency_s: 300
+event_sink_keys:
+  - "medium_severity_alerts"
+tags:
+  - "attack.reconnaissance"
+  - "attack.discovery"
+  - "attack.impact"

@@ -1,0 +1,16 @@
+# schema: https://scanner.dev/schema/scanner-detection-rule.v1.json
+name: "HackTool - Rubeus Execution - ScriptBlock"
+description: "Detects the execution of the hacktool Rubeus using specific command line flags"
+severity: High
+query_text: |
+  (((Event.EventData.ScriptBlockText:"asreproast " or Event.EventData.ScriptBlockText:"dump /service:krbtgt " or Event.EventData.ScriptBlockText:"dump /luid:0x" or Event.EventData.ScriptBlockText:"kerberoast " or Event.EventData.ScriptBlockText:"createnetonly /program:" or Event.EventData.ScriptBlockText:"ptt /ticket:" or Event.EventData.ScriptBlockText:"/impersonateuser:" or Event.EventData.ScriptBlockText:"renew /ticket:" or Event.EventData.ScriptBlockText:"asktgt /user:" or Event.EventData.ScriptBlockText:"harvest /interval:" or Event.EventData.ScriptBlockText:"s4u /user:" or Event.EventData.ScriptBlockText:"s4u /ticket:" or Event.EventData.ScriptBlockText:"hash /password:" or Event.EventData.ScriptBlockText:"golden /aes256:" or Event.EventData.ScriptBlockText:"silver /user:")))
+time_range_s: 600
+run_frequency_s: 300
+event_sink_keys:
+  - "high_severity_alerts"
+tags:
+  - "attack.credential-access"
+  - "attack.t1003"
+  - "attack.t1558.003"
+  - "attack.lateral-movement"
+  - "attack.t1550.003"

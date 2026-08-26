@@ -1,0 +1,13 @@
+# schema: https://scanner.dev/schema/scanner-detection-rule.v1.json
+name: "Suspicious Get-ADDBAccount Usage"
+description: "Detects suspicious invocation of the Get-ADDBAccount script that reads from a ntds.dit file and may be used to get access to credentials without using any credential dumpers"
+severity: High
+query_text: |
+  (((Event.EventData.Payload:"Get-ADDBAccount" and Event.EventData.Payload:"BootKey " and Event.EventData.Payload:"DatabasePath ")))
+time_range_s: 600
+run_frequency_s: 300
+event_sink_keys:
+  - "high_severity_alerts"
+tags:
+  - "attack.credential-access"
+  - "attack.t1003.003"

@@ -1,0 +1,13 @@
+# schema: https://scanner.dev/schema/scanner-detection-rule.v1.json
+name: "Suspicious PowerShell Invocations - Generic - PowerShell Module"
+description: "Detects suspicious PowerShell invocation command parameters"
+severity: High
+query_text: |
+  (((Event.EventData.ContextInfo:" -enc " or Event.EventData.ContextInfo:" -EncodedCommand " or Event.EventData.ContextInfo:" -ec ") and (Event.EventData.ContextInfo:" -w hidden " or Event.EventData.ContextInfo:" -window hidden " or Event.EventData.ContextInfo:" -windowstyle hidden " or Event.EventData.ContextInfo:" -w 1 ") and (Event.EventData.ContextInfo:" -noni " or Event.EventData.ContextInfo:" -noninteractive ")))
+time_range_s: 600
+run_frequency_s: 300
+event_sink_keys:
+  - "high_severity_alerts"
+tags:
+  - "attack.execution"
+  - "attack.t1059.001"

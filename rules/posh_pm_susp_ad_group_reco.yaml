@@ -1,0 +1,13 @@
+# schema: https://scanner.dev/schema/scanner-detection-rule.v1.json
+name: "AD Groups Or Users Enumeration Using PowerShell - PoshModule"
+description: "Adversaries may attempt to find domain-level groups and permission settings.\nThe knowledge of domain-level permission groups can help adversaries determine which groups exist and which users belong to a particular group.\nAdversaries may use this information to determine which users have elevated permissions, such as domain administrators."
+severity: Low
+query_text: |
+  (((Event.EventData.Payload:"get-ADPrincipalGroupMembership" or Event.EventData.ContextInfo:"get-ADPrincipalGroupMembership") or ((Event.EventData.Payload:"get-aduser" and Event.EventData.Payload:"-f " and Event.EventData.Payload:"-pr " and Event.EventData.Payload:DoesNotRequirePreAuth) or (Event.EventData.ContextInfo:"get-aduser" and Event.EventData.ContextInfo:"-f " and Event.EventData.ContextInfo:"-pr " and Event.EventData.ContextInfo:DoesNotRequirePreAuth))))
+time_range_s: 600
+run_frequency_s: 300
+event_sink_keys:
+  - "low_severity_alerts"
+tags:
+  - "attack.discovery"
+  - "attack.t1069.001"

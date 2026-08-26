@@ -1,0 +1,13 @@
+# schema: https://scanner.dev/schema/scanner-detection-rule.v1.json
+name: "Alternate PowerShell Hosts - PowerShell Module"
+description: "Detects alternate PowerShell hosts potentially bypassing detections looking for powershell.exe"
+severity: Medium
+query_text: |
+  ((Event.EventData.ContextInfo:*) and not (Event.EventData.ContextInfo:"C:\\Windows\\system32\\dsac.exe" or Event.EventData.ContextInfo:"ConfigSyncRun.exe" or (Event.EventData.Payload:"Update-Help" or Event.EventData.Payload:"Failed to update Help for the module") or (Event.EventData.ContextInfo:"= powershell" or Event.EventData.ContextInfo:"= C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\powershell" or Event.EventData.ContextInfo:"= C:\\Windows\\SysWOW64\\WindowsPowerShell\\v1.0\\powershell" or Event.EventData.ContextInfo:"= C:/Windows/System32/WindowsPowerShell/v1.0/powershell" or Event.EventData.ContextInfo:"= C:/Windows/SysWOW64/WindowsPowerShell/v1.0/powershell" or Event.EventData.ContextInfo:"= \\\\\\?\\?\\C:Windows\\System32\\WindowsPowerShell\\v1.0\\powershell" or Event.EventData.ContextInfo:"= \\\\\\?\\?\\C:Windows\\SysWOW64\\WindowsPowerShell\\v1.0\\powershell") or Event.EventData.ContextInfo:"= C:\\WINDOWS\\System32\\sdiagnhost.exe -Embedding" or Event.EventData.ContextInfo:"C:\\Windows\\system32\\wsmprovhost.exe -Embedding"))
+time_range_s: 600
+run_frequency_s: 300
+event_sink_keys:
+  - "medium_severity_alerts"
+tags:
+  - "attack.execution"
+  - "attack.t1059.001"

@@ -1,0 +1,13 @@
+# schema: https://scanner.dev/schema/scanner-detection-rule.v1.json
+name: "Potential Invoke-Mimikatz PowerShell Script"
+description: "Detects Invoke-Mimikatz PowerShell script and alike. Mimikatz is a credential dumper capable of obtaining plaintext Windows account logins and passwords."
+severity: High
+query_text: |
+  (((Event.EventData.ScriptBlockText:DumpCreds and Event.EventData.ScriptBlockText:DumpCerts) or Event.EventData.ScriptBlockText:"sekurlsa::logonpasswords" or (Event.EventData.ScriptBlockText:"crypto::certificates" and Event.EventData.ScriptBlockText:CERT_SYSTEM_STORE_LOCAL_MACHINE)))
+time_range_s: 600
+run_frequency_s: 300
+event_sink_keys:
+  - "high_severity_alerts"
+tags:
+  - "attack.credential-access"
+  - "attack.t1003"

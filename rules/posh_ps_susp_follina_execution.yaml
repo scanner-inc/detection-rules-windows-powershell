@@ -1,0 +1,13 @@
+# schema: https://scanner.dev/schema/scanner-detection-rule.v1.json
+name: "Troubleshooting Pack Cmdlet Execution"
+description: "Detects execution of \"TroubleshootingPack\" cmdlets to leverage CVE-2022-30190 or action similar to \"msdt\" lolbin (as described in LOLBAS)"
+severity: Medium
+query_text: |
+  (((Event.EventData.ScriptBlockText:"Invoke-TroubleshootingPack" and Event.EventData.ScriptBlockText:"C:\\Windows\\Diagnostics\\System\\PCW" and Event.EventData.ScriptBlockText:"-AnswerFile" and Event.EventData.ScriptBlockText:"-Unattended")))
+time_range_s: 600
+run_frequency_s: 300
+event_sink_keys:
+  - "medium_severity_alerts"
+tags:
+  - "attack.stealth"
+  - "attack.t1202"

@@ -1,0 +1,13 @@
+# schema: https://scanner.dev/schema/scanner-detection-rule.v1.json
+name: "Clear PowerShell History - PowerShell Module"
+description: "Detects keywords that could indicate clearing PowerShell history"
+severity: Medium
+query_text: |
+  (((Event.EventData.Payload:"Set-PSReadlineOption" and Event.EventData.Payload:"–HistorySaveStyle" and Event.EventData.Payload:SaveNothing) or (Event.EventData.Payload:"Set-PSReadlineOption" and Event.EventData.Payload:"-HistorySaveStyle" and Event.EventData.Payload:SaveNothing)) or ((Event.EventData.Payload:del or Event.EventData.Payload:"Remove-Item" or Event.EventData.Payload:rm) and Event.EventData.Payload:"(Get-PSReadlineOption).HistorySavePath"))
+time_range_s: 600
+run_frequency_s: 300
+event_sink_keys:
+  - "medium_severity_alerts"
+tags:
+  - "attack.stealth"
+  - "attack.t1070.003"

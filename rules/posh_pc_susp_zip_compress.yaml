@@ -1,0 +1,13 @@
+# schema: https://scanner.dev/schema/scanner-detection-rule.v1.json
+name: "Zip A Folder With PowerShell For Staging In Temp - PowerShell"
+description: "Detects PowerShell scripts that make use of the \"Compress-Archive\" Cmdlet in order to compress folders and files where the output is stored in a potentially suspicious location that is used often by malware for exfiltration.\nAn adversary might compress data (e.g., sensitive documents) that is collected prior to exfiltration in order to make it portable and minimize the amount of data sent over the network."
+severity: Medium
+query_text: |
+  (((Event.EventData.Data:"Compress-Archive -Path*-DestinationPath $env:TEMP" or Event.EventData.Data:"Compress-Archive -Path*-DestinationPath*\\AppData\\Local\\Temp\\" or Event.EventData.Data:"Compress-Archive -Path*-DestinationPath*:\\Windows\\Temp\\")))
+time_range_s: 600
+run_frequency_s: 300
+event_sink_keys:
+  - "medium_severity_alerts"
+tags:
+  - "attack.collection"
+  - "attack.t1074.001"

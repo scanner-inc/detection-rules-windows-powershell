@@ -4,6 +4,7 @@ description: "Detects when a user disables the Windows Firewall via a Profile to
 severity: Medium
 query_text: |
   (((Event.EventData.ScriptBlockText:"Set-NetFirewallProfile " and Event.EventData.ScriptBlockText:" -Enabled " and Event.EventData.ScriptBlockText:" False") and (Event.EventData.ScriptBlockText:" -All " or Event.EventData.ScriptBlockText:Public or Event.EventData.ScriptBlockText:Domain or Event.EventData.ScriptBlockText:Private)))
+  | table(Event.System.TimeCreated.SystemTime, Event.System.Computer, Event.System.Security.UserID, Event.System.EventID, Event.EventData.ScriptBlockText, Event.EventData.ScriptBlockId, Event.EventData.Path)
 time_range_s: 600
 run_frequency_s: 300
 event_sink_keys:

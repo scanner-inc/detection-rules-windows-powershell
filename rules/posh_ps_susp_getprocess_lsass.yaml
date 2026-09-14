@@ -4,6 +4,7 @@ description: "Detects a Get-Process command on lsass process, which is in almost
 severity: High
 query_text: |
   ((Event.EventData.ScriptBlockText:"Get-Process lsass"))
+  | table(Event.System.TimeCreated.SystemTime, Event.System.Computer, Event.System.Security.UserID, Event.System.EventID, Event.EventData.ScriptBlockText, Event.EventData.ScriptBlockId, Event.EventData.Path)
 time_range_s: 600
 run_frequency_s: 300
 event_sink_keys:

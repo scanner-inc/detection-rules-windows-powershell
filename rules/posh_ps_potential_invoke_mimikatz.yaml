@@ -4,6 +4,7 @@ description: "Detects Invoke-Mimikatz PowerShell script and alike. Mimikatz is a
 severity: High
 query_text: |
   (((Event.EventData.ScriptBlockText:DumpCreds and Event.EventData.ScriptBlockText:DumpCerts) or Event.EventData.ScriptBlockText:"sekurlsa::logonpasswords" or (Event.EventData.ScriptBlockText:"crypto::certificates" and Event.EventData.ScriptBlockText:CERT_SYSTEM_STORE_LOCAL_MACHINE)))
+  | table(Event.System.TimeCreated.SystemTime, Event.System.Computer, Event.System.Security.UserID, Event.System.EventID, Event.EventData.ScriptBlockText, Event.EventData.ScriptBlockId, Event.EventData.Path)
 time_range_s: 600
 run_frequency_s: 300
 event_sink_keys:

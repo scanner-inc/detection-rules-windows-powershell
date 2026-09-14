@@ -4,6 +4,7 @@ description: "Detects suspicious use of the WSMAN provider without PowerShell.ex
 severity: Medium
 query_text: |
   ((Event.EventData.Data:"ProviderName=WSMan") and not ((Event.EventData.Data:"HostApplication=powershell" or Event.EventData.Data:"HostApplication=C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\powershell" or Event.EventData.Data:"HostApplication=C:\\Windows\\SysWOW64\\WindowsPowerShell\\v1.0\\powershell" or Event.EventData.Data:"HostApplication=C:/Windows/System32/WindowsPowerShell/v1.0/powershell" or Event.EventData.Data:"HostApplication=C:/Windows/SysWOW64/WindowsPowerShell/v1.0/powershell")) and not (Event.EventData.Data:"HostApplication=C:\\Hexnode\\Hexnode Agent\\Current\\HexnodeAgent.exe"))
+  | table(Event.System.TimeCreated.SystemTime, Event.System.Computer, Event.System.Security.UserID, Event.System.EventID, Event.EventData.Data)
 time_range_s: 600
 run_frequency_s: 300
 event_sink_keys:

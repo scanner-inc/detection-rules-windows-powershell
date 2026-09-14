@@ -4,6 +4,7 @@ description: "Detects execution of \"TroubleshootingPack\" cmdlets to leverage C
 severity: Medium
 query_text: |
   (((Event.EventData.ScriptBlockText:"Invoke-TroubleshootingPack" and Event.EventData.ScriptBlockText:"C:\\Windows\\Diagnostics\\System\\PCW" and Event.EventData.ScriptBlockText:"-AnswerFile" and Event.EventData.ScriptBlockText:"-Unattended")))
+  | table(Event.System.TimeCreated.SystemTime, Event.System.Computer, Event.System.Security.UserID, Event.System.EventID, Event.EventData.ScriptBlockText, Event.EventData.ScriptBlockId, Event.EventData.Path)
 time_range_s: 600
 run_frequency_s: 300
 event_sink_keys:

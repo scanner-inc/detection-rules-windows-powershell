@@ -4,8 +4,10 @@ description: "Adversaries may attempt to find domain-level groups and permission
 severity: Low
 query_text: |
   (((Event.EventData.Payload:"get-ADPrincipalGroupMembership" or Event.EventData.ContextInfo:"get-ADPrincipalGroupMembership") or ((Event.EventData.Payload:"get-aduser" and Event.EventData.Payload:"-f " and Event.EventData.Payload:"-pr " and Event.EventData.Payload:DoesNotRequirePreAuth) or (Event.EventData.ContextInfo:"get-aduser" and Event.EventData.ContextInfo:"-f " and Event.EventData.ContextInfo:"-pr " and Event.EventData.ContextInfo:DoesNotRequirePreAuth))))
-time_range_s: 600
-run_frequency_s: 300
+  | stats count() as enumeration_count by Event.System.Computer, Event.System.Security.UserID
+  | where(enumeration_count > 2)
+time_range_s: 1800
+run_frequency_s: 900
 event_sink_keys:
   - "low_severity_alerts"
 tags:

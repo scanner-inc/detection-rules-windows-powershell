@@ -4,6 +4,7 @@ description: "Adversaries may use a non-application layer protocol for communica
 severity: Medium
 query_text: |
   (((Event.EventData.Data:"powercat " or Event.EventData.Data:"powercat.ps1")))
+  | table(Event.System.TimeCreated.SystemTime, Event.System.Computer, Event.System.Security.UserID, Event.System.EventID, Event.EventData.Data)
 time_range_s: 600
 run_frequency_s: 300
 event_sink_keys:

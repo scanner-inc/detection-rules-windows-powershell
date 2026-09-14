@@ -4,6 +4,7 @@ description: "Detects alternate PowerShell hosts potentially bypassing detection
 severity: Medium
 query_text: |
   ((Event.EventData.ContextInfo:*) and not (Event.EventData.ContextInfo:"C:\\Windows\\system32\\dsac.exe" or Event.EventData.ContextInfo:"ConfigSyncRun.exe" or (Event.EventData.Payload:"Update-Help" or Event.EventData.Payload:"Failed to update Help for the module") or (Event.EventData.ContextInfo:"= powershell" or Event.EventData.ContextInfo:"= C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\powershell" or Event.EventData.ContextInfo:"= C:\\Windows\\SysWOW64\\WindowsPowerShell\\v1.0\\powershell" or Event.EventData.ContextInfo:"= C:/Windows/System32/WindowsPowerShell/v1.0/powershell" or Event.EventData.ContextInfo:"= C:/Windows/SysWOW64/WindowsPowerShell/v1.0/powershell" or Event.EventData.ContextInfo:"= \\\\\\?\\?\\C:Windows\\System32\\WindowsPowerShell\\v1.0\\powershell" or Event.EventData.ContextInfo:"= \\\\\\?\\?\\C:Windows\\SysWOW64\\WindowsPowerShell\\v1.0\\powershell") or Event.EventData.ContextInfo:"= C:\\WINDOWS\\System32\\sdiagnhost.exe -Embedding" or Event.EventData.ContextInfo:"C:\\Windows\\system32\\wsmprovhost.exe -Embedding"))
+  | table(Event.System.TimeCreated.SystemTime, Event.System.Computer, Event.System.Security.UserID, Event.System.EventID, Event.EventData.Payload, Event.EventData.ContextInfo)
 time_range_s: 600
 run_frequency_s: 300
 event_sink_keys:

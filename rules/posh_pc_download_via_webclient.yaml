@@ -4,6 +4,7 @@ description: "Detects PowerShell download activity, via the .DownloadFile() or .
 severity: Low
 query_text: |
   (((Event.EventData.Data:".DownloadFile(" or Event.EventData.Data:".DownloadString(") and Event.EventData.Data:"Net.WebClient"))
+  | table(Event.System.TimeCreated.SystemTime, Event.System.Computer, Event.System.Security.UserID, Event.System.EventID, Event.EventData.Data)
 time_range_s: 600
 run_frequency_s: 300
 event_sink_keys:

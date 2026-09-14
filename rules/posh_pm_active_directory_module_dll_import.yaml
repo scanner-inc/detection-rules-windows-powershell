@@ -4,6 +4,7 @@ description: "Detects usage of the \"Import-Module\" cmdlet to load the \"Micros
 severity: Medium
 query_text: |
   (((Event.EventData.Payload:"Import-Module " or Event.EventData.Payload:"ipmo ") and Event.EventData.Payload:"Microsoft.ActiveDirectory.Management.dll"))
+  | table(Event.System.TimeCreated.SystemTime, Event.System.Computer, Event.System.Security.UserID, Event.System.EventID, Event.EventData.Payload, Event.EventData.ContextInfo)
 time_range_s: 600
 run_frequency_s: 300
 event_sink_keys:

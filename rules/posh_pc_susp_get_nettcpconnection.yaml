@@ -4,8 +4,10 @@ description: "Adversaries may attempt to get a listing of network connections to
 severity: Low
 query_text: |
   ((Event.EventData.Data:"Get-NetTCPConnection"))
-time_range_s: 600
-run_frequency_s: 300
+  | stats count() as query_count by Event.System.Computer, Event.System.Security.UserID
+  | where(query_count > 4)
+time_range_s: 1800
+run_frequency_s: 900
 event_sink_keys:
   - "low_severity_alerts"
 tags:

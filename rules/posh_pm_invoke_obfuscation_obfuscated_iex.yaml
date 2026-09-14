@@ -4,6 +4,7 @@ description: "Detects all variations of obfuscated powershell IEX invocation cod
 severity: High
 query_text: |
   (Event.EventData.Payload:"$PSHome[" and Event.EventData.Payload:"+ $PSHome[")
+  | table(Event.System.TimeCreated.SystemTime, Event.System.Computer, Event.System.Security.UserID, Event.System.EventID, Event.EventData.Payload, Event.EventData.ContextInfo)
 time_range_s: 600
 run_frequency_s: 300
 event_sink_keys:

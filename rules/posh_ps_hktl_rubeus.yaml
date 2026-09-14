@@ -4,6 +4,7 @@ description: "Detects the execution of the hacktool Rubeus using specific comman
 severity: High
 query_text: |
   (((Event.EventData.ScriptBlockText:"asreproast " or Event.EventData.ScriptBlockText:"dump /service:krbtgt " or Event.EventData.ScriptBlockText:"dump /luid:0x" or Event.EventData.ScriptBlockText:"kerberoast " or Event.EventData.ScriptBlockText:"createnetonly /program:" or Event.EventData.ScriptBlockText:"ptt /ticket:" or Event.EventData.ScriptBlockText:"/impersonateuser:" or Event.EventData.ScriptBlockText:"renew /ticket:" or Event.EventData.ScriptBlockText:"asktgt /user:" or Event.EventData.ScriptBlockText:"harvest /interval:" or Event.EventData.ScriptBlockText:"s4u /user:" or Event.EventData.ScriptBlockText:"s4u /ticket:" or Event.EventData.ScriptBlockText:"hash /password:" or Event.EventData.ScriptBlockText:"golden /aes256:" or Event.EventData.ScriptBlockText:"silver /user:")))
+  | table(Event.System.TimeCreated.SystemTime, Event.System.Computer, Event.System.Security.UserID, Event.System.EventID, Event.EventData.ScriptBlockText, Event.EventData.ScriptBlockId, Event.EventData.Path)
 time_range_s: 600
 run_frequency_s: 300
 event_sink_keys:

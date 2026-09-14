@@ -4,6 +4,7 @@ description: "Detects attempts of decoding a base64 Gzip archive in a PowerShell
 severity: Medium
 query_text: |
   (((Event.EventData.ScriptBlockText:FromBase64String and Event.EventData.ScriptBlockText:MemoryStream and Event.EventData.ScriptBlockText:H4sI*)))
+  | table(Event.System.TimeCreated.SystemTime, Event.System.Computer, Event.System.Security.UserID, Event.System.EventID, Event.EventData.ScriptBlockText, Event.EventData.ScriptBlockId, Event.EventData.Path)
 time_range_s: 600
 run_frequency_s: 300
 event_sink_keys:

@@ -4,6 +4,7 @@ description: "focuses on trivial artifacts observed in variants of prevalent off
 severity: Critical
 query_text: |
   (((Event.EventData.Payload:"$DoIt" or Event.EventData.Payload:harmj0y or Event.EventData.Payload:mattifestation or Event.EventData.Payload:_RastaMouse or Event.EventData.Payload:tifkin_ or Event.EventData.Payload:0xdeadbeef)))
+  | table(Event.System.TimeCreated.SystemTime, Event.System.Computer, Event.System.Security.UserID, Event.System.EventID, Event.EventData.Payload, Event.EventData.ContextInfo)
 time_range_s: 600
 run_frequency_s: 300
 event_sink_keys:

@@ -4,6 +4,7 @@ description: "A General detection for the Get-Clipboard commands in PowerShell l
 severity: Medium
 query_text: |
   ((Event.EventData.Payload:"Get-Clipboard"))
+  | table(Event.System.TimeCreated.SystemTime, Event.System.Computer, Event.System.Security.UserID, Event.System.EventID, Event.EventData.Payload, Event.EventData.ContextInfo)
 time_range_s: 600
 run_frequency_s: 300
 event_sink_keys:

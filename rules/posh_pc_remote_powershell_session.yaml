@@ -4,6 +4,7 @@ description: "Detects remote PowerShell sessions"
 severity: Low
 query_text: |
   (((Event.EventData.Data:"HostName=ServerRemoteHost" and Event.EventData.Data:"wsmprovhost.exe")))
+  | table(Event.System.TimeCreated.SystemTime, Event.System.Computer, Event.System.Security.UserID, Event.System.EventID, Event.EventData.Data)
 time_range_s: 600
 run_frequency_s: 300
 event_sink_keys:

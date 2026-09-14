@@ -4,6 +4,7 @@ description: "Detects keywords that could indicate clearing PowerShell history"
 severity: Medium
 query_text: |
   (((Event.EventData.ScriptBlockText:"Set-PSReadlineOption" and Event.EventData.ScriptBlockText:"–HistorySaveStyle" and Event.EventData.ScriptBlockText:SaveNothing) or (Event.EventData.ScriptBlockText:"Set-PSReadlineOption" and Event.EventData.ScriptBlockText:"-HistorySaveStyle" and Event.EventData.ScriptBlockText:SaveNothing)) or ((Event.EventData.ScriptBlockText:del or Event.EventData.ScriptBlockText:"Remove-Item" or Event.EventData.ScriptBlockText:rm) and Event.EventData.ScriptBlockText:"(Get-PSReadlineOption).HistorySavePath"))
+  | table(Event.System.TimeCreated.SystemTime, Event.System.Computer, Event.System.Security.UserID, Event.System.EventID, Event.EventData.ScriptBlockText, Event.EventData.ScriptBlockId, Event.EventData.Path)
 time_range_s: 600
 run_frequency_s: 300
 event_sink_keys:

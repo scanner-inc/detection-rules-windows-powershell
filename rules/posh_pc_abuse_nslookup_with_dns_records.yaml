@@ -4,6 +4,7 @@ description: "Detects a powershell download cradle using nslookup. This cradle u
 severity: Medium
 query_text: |
   ((((Event.EventData.Data:powershell and Event.EventData.Data:nslookup and Event.EventData.Data:"[1]") and (Event.EventData.Data:"-q=txt http" or Event.EventData.Data:"-querytype=txt http" or Event.EventData.Data:"-type=txt http"))))
+  | table(Event.System.TimeCreated.SystemTime, Event.System.Computer, Event.System.Security.UserID, Event.System.EventID, Event.EventData.Data)
 time_range_s: 600
 run_frequency_s: 300
 event_sink_keys:

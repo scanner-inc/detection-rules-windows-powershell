@@ -1,0 +1,26 @@
+# schema: https://scanner.dev/schema/scanner-detection-rule.v1.json
+name: "Powershell WMI Persistence"
+description: "Adversaries may establish persistence and elevate privileges by executing malicious content triggered by a Windows Management Instrumentation (WMI) event subscription."
+severity: Medium
+query_text: |
+  ((((Event.EventData.ScriptBlockText:"New-CimInstance " and Event.EventData.ScriptBlockText:"-Namespace root/subscription " and Event.EventData.ScriptBlockText:"-ClassName __EventFilter " and Event.EventData.ScriptBlockText:"-Property ") or (Event.EventData.ScriptBlockText:"New-CimInstance " and Event.EventData.ScriptBlockText:"-Namespace root/subscription " and Event.EventData.ScriptBlockText:"-ClassName CommandLineEventConsumer " and Event.EventData.ScriptBlockText:"-Property "))))
+  | table(Event.System.TimeCreated.SystemTime, Event.System.Computer, Event.System.Security.UserID, Event.System.EventID, Event.EventData.ScriptBlockText, Event.EventData.ScriptBlockId, Event.EventData.Path)
+time_range_s: 600
+run_frequency_s: 300
+event_sink_keys:
+  - "medium_severity_alerts"
+tags:
+  - "attack.persistence"
+  - "attack.privilege-escalation"
+  - "attack.t1546.003"
+tests:
+  - name: "Alerts on a matching event"
+    now_timestamp: "2026-09-22T00:10:00.000Z"
+    dataset_inline: |
+      {"@scnr.datetime": "2026-09-22T00:08:00.000Z", "Event.EventData.Path": "", "Event.EventData.ScriptBlockId": "5f1a1a3e-88b0-4e63-9f0b-6f2c2b0a1234", "Event.EventData.ScriptBlockText": "New-CimInstance ; -Namespace root/subscription ; -ClassName __EventFilter ; -Property ", "Event.System.Channel": "Microsoft-Windows-PowerShell/Operational", "Event.System.Computer": "WKS-ENG-221.corp.scanner.dev", "Event.System.EventID": "4104", "Event.System.Security.UserID": "S-1-5-21-1111111111-2222222222-3333333333-1105"}
+    expected_detection_result: true
+  - name: "Does not alert on unrelated benign PowerShell activity"
+    now_timestamp: "2026-09-22T00:10:00.000Z"
+    dataset_inline: |
+      {"@scnr.datetime": "2026-09-22T00:08:00.000Z", "Event.EventData.Path": "", "Event.EventData.ScriptBlockId": "5f1a1a3e-88b0-4e63-9f0b-6f2c2b0a1234", "Event.EventData.ScriptBlockText": "Get-ChildItem -Path C:\\\\Users\\\\jdoe\\\\Documents | Sort-Object LastWriteTime | Select-Object -First 10", "Event.System.Channel": "Microsoft-Windows-PowerShell/Operational", "Event.System.Computer": "WKS-ENG-221.corp.scanner.dev", "Event.System.EventID": "4104", "Event.System.Security.UserID": "S-1-5-21-1111111111-2222222222-3333333333-1105"}
+    expected_detection_result: false

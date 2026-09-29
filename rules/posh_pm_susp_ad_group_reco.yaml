@@ -1,0 +1,29 @@
+# schema: https://scanner.dev/schema/scanner-detection-rule.v1.json
+name: "AD Groups Or Users Enumeration Using PowerShell - PoshModule"
+description: "Adversaries may attempt to find domain-level groups and permission settings.\nThe knowledge of domain-level permission groups can help adversaries determine which groups exist and which users belong to a particular group.\nAdversaries may use this information to determine which users have elevated permissions, such as domain administrators."
+severity: Low
+query_text: |
+  (((Event.EventData.Payload:"get-ADPrincipalGroupMembership" or Event.EventData.ContextInfo:"get-ADPrincipalGroupMembership") or ((Event.EventData.Payload:"get-aduser" and Event.EventData.Payload:"-f " and Event.EventData.Payload:"-pr " and Event.EventData.Payload:DoesNotRequirePreAuth) or (Event.EventData.ContextInfo:"get-aduser" and Event.EventData.ContextInfo:"-f " and Event.EventData.ContextInfo:"-pr " and Event.EventData.ContextInfo:DoesNotRequirePreAuth))))
+  | stats count() as enumeration_count by Event.System.Computer, Event.System.Security.UserID
+  | where(enumeration_count > 2)
+time_range_s: 1800
+run_frequency_s: 900
+event_sink_keys:
+  - "low_severity_alerts"
+tags:
+  - "attack.discovery"
+  - "attack.t1069.001"
+tests:
+  - name: "Alerts when the same user/host repeats the activity more than 2 times within the lookback window"
+    now_timestamp: "2026-09-22T00:10:00.000Z"
+    dataset_inline: |
+      {"@scnr.datetime": "2026-09-22T00:04:00.000Z", "Event.EventData.Payload": "get-ADPrincipalGroupMembership", "Event.System.Channel": "Microsoft-Windows-PowerShell/Operational", "Event.System.Computer": "WKS-ENG-221.corp.scanner.dev", "Event.System.EventID": "4103", "Event.System.Security.UserID": "S-1-5-21-1111111111-2222222222-3333333333-1105"}
+      {"@scnr.datetime": "2026-09-22T00:06:00.000Z", "Event.EventData.Payload": "get-ADPrincipalGroupMembership", "Event.System.Channel": "Microsoft-Windows-PowerShell/Operational", "Event.System.Computer": "WKS-ENG-221.corp.scanner.dev", "Event.System.EventID": "4103", "Event.System.Security.UserID": "S-1-5-21-1111111111-2222222222-3333333333-1105"}
+      {"@scnr.datetime": "2026-09-22T00:08:00.000Z", "Event.EventData.Payload": "get-ADPrincipalGroupMembership", "Event.System.Channel": "Microsoft-Windows-PowerShell/Operational", "Event.System.Computer": "WKS-ENG-221.corp.scanner.dev", "Event.System.EventID": "4103", "Event.System.Security.UserID": "S-1-5-21-1111111111-2222222222-3333333333-1105"}
+    expected_detection_result: true
+  - name: "Does not alert when the count stays at the 2-occurrence threshold (not exceeding it)"
+    now_timestamp: "2026-09-22T00:10:00.000Z"
+    dataset_inline: |
+      {"@scnr.datetime": "2026-09-22T00:06:00.000Z", "Event.EventData.Payload": "get-ADPrincipalGroupMembership", "Event.System.Channel": "Microsoft-Windows-PowerShell/Operational", "Event.System.Computer": "WKS-ENG-221.corp.scanner.dev", "Event.System.EventID": "4103", "Event.System.Security.UserID": "S-1-5-21-1111111111-2222222222-3333333333-1105"}
+      {"@scnr.datetime": "2026-09-22T00:08:00.000Z", "Event.EventData.Payload": "get-ADPrincipalGroupMembership", "Event.System.Channel": "Microsoft-Windows-PowerShell/Operational", "Event.System.Computer": "WKS-ENG-221.corp.scanner.dev", "Event.System.EventID": "4103", "Event.System.Security.UserID": "S-1-5-21-1111111111-2222222222-3333333333-1105"}
+    expected_detection_result: false

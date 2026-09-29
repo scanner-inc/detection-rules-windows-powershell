@@ -1,0 +1,28 @@
+# schema: https://scanner.dev/schema/scanner-detection-rule.v1.json
+name: "HackTool - Rubeus Execution - ScriptBlock"
+description: "Detects the execution of the hacktool Rubeus using specific command line flags"
+severity: High
+query_text: |
+  (((Event.EventData.ScriptBlockText:("asreproast " "dump /service:krbtgt " "dump /luid:0x" "kerberoast " "createnetonly /program:" "ptt /ticket:" "/impersonateuser:" "renew /ticket:" "asktgt /user:" "harvest /interval:" "s4u /user:" "s4u /ticket:" "hash /password:" "golden /aes256:" "silver /user:"))))
+  | table(Event.System.TimeCreated.SystemTime, Event.System.Computer, Event.System.Security.UserID, Event.System.EventID, Event.EventData.ScriptBlockText, Event.EventData.ScriptBlockId, Event.EventData.Path)
+time_range_s: 600
+run_frequency_s: 300
+event_sink_keys:
+  - "high_severity_alerts"
+tags:
+  - "attack.credential-access"
+  - "attack.t1003"
+  - "attack.t1558.003"
+  - "attack.lateral-movement"
+  - "attack.t1550.003"
+tests:
+  - name: "Alerts on a matching event"
+    now_timestamp: "2026-09-22T00:10:00.000Z"
+    dataset_inline: |
+      {"@scnr.datetime": "2026-09-22T00:08:00.000Z", "Event.EventData.Path": "", "Event.EventData.ScriptBlockId": "5f1a1a3e-88b0-4e63-9f0b-6f2c2b0a1234", "Event.EventData.ScriptBlockText": "asreproast ", "Event.System.Channel": "Microsoft-Windows-PowerShell/Operational", "Event.System.Computer": "WKS-ENG-221.corp.scanner.dev", "Event.System.EventID": "4104", "Event.System.Security.UserID": "S-1-5-21-1111111111-2222222222-3333333333-1105"}
+    expected_detection_result: true
+  - name: "Does not alert on unrelated benign PowerShell activity"
+    now_timestamp: "2026-09-22T00:10:00.000Z"
+    dataset_inline: |
+      {"@scnr.datetime": "2026-09-22T00:08:00.000Z", "Event.EventData.Path": "", "Event.EventData.ScriptBlockId": "5f1a1a3e-88b0-4e63-9f0b-6f2c2b0a1234", "Event.EventData.ScriptBlockText": "Get-ChildItem -Path C:\\\\Users\\\\jdoe\\\\Documents | Sort-Object LastWriteTime | Select-Object -First 10", "Event.System.Channel": "Microsoft-Windows-PowerShell/Operational", "Event.System.Computer": "WKS-ENG-221.corp.scanner.dev", "Event.System.EventID": "4104", "Event.System.Security.UserID": "S-1-5-21-1111111111-2222222222-3333333333-1105"}
+    expected_detection_result: false

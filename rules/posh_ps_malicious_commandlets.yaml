@@ -1,0 +1,33 @@
+# schema: https://scanner.dev/schema/scanner-detection-rule.v1.json
+name: "Malicious PowerShell Commandlets - ScriptBlock"
+description: "Detects Commandlet names from well-known PowerShell exploitation frameworks"
+severity: High
+query_text: |
+  (((Event.EventData.ScriptBlockText:("Add-Exfiltration" "Add-Persistence" "Add-RegBackdoor" "Add-RemoteRegBackdoor" "Add-ScrnSaveBackdoor" "ConvertTo-Rc4ByteStream" "Decrypt-Hash" "Disable-ADIDNSNode" "Do-Exfiltration" "Enable-ADIDNSNode" "Enabled-DuplicateToken" "Exploit-Jboss" "Export-ADRCSV" "Export-ADRExcel" "Export-ADRHTML" "Export-ADRJSON" "Export-ADRXML" "Find-Fruit" "Find-GPOLocation" "Find-TrustedDocuments" "Get-ADIDNSNodeAttribute" "Get-ADIDNSNodeOwner" "Get-ADIDNSNodeTombstoned" "Get-ADIDNSPermission" "Get-ADIDNSZone" "Get-ChromeDump" "Get-ClipboardContents" "Get-FoxDump" "Get-GPPPassword" "Get-IndexedItem" "Get-KerberosAESKey" "Get-Keystrokes" "Get-LSASecret" "Get-PassHashes" "Get-RegAlwaysInstallElevated" "Get-RegAutoLogon" "Get-RemoteBootKey" "Get-RemoteCachedCredential" "Get-RemoteLocalAccountHash" "Get-RemoteLSAKey" "Get-RemoteMachineAccountHash" "Get-RemoteNLKMKey" "Get-RickAstley" "Get-SecurityPackages" "Get-ServiceFilePermission" "Get-ServicePermission" "Get-ServiceUnquoted" "Get-SiteListPassword" "Get-System" "Get-TimedScreenshot" "Get-UnattendedInstallFile" "Get-Unconstrained" "Get-USBKeystrokes" "Get-VaultCredential" "Get-VulnAutoRun" "Get-VulnSchTask" "Grant-ADIDNSPermission" "Gupt-Backdoor" "Invoke-ACLScanner" "Invoke-ADRecon" "Invoke-ADSBackdoor" "Invoke-AgentSmith" "Invoke-AllChecks" "Invoke-ARPScan" "Invoke-AzureHound" "Invoke-BackdoorLNK" "Invoke-BadPotato" "Invoke-BetterSafetyKatz" "Invoke-BypassUAC" "Invoke-Carbuncle" "Invoke-Certify" "Invoke-ConPtyShell" "Invoke-CredentialInjection" "Invoke-DAFT" "Invoke-DCSync" "Invoke-DinvokeKatz" "Invoke-DllInjection" "Invoke-DNSUpdate" "Invoke-DNSExfiltrator" "Invoke-DomainPasswordSpray" "Invoke-DowngradeAccount" "Invoke-EgressCheck" "Invoke-Eyewitness" "Invoke-FakeLogonScreen" "Invoke-Farmer" "Invoke-Get-RBCD-Threaded" "Invoke-Gopher" "Invoke-Grouper" "Invoke-HandleKatz" "Invoke-ImpersonatedProcess" "Invoke-ImpersonateSystem" "Invoke-InteractiveSystemPowerShell" "Invoke-Internalmonologue" "Invoke-Inveigh" "Invoke-InveighRelay" "Invoke-KrbRelay" "Invoke-LdapSignCheck" "Invoke-Lockless" "Invoke-MalSCCM" "Invoke-Mimikatz" "Invoke-Mimikittenz" "Invoke-MITM6" "Invoke-NanoDump" "Invoke-NetRipper" "Invoke-Nightmare" "Invoke-NinjaCopy" "Invoke-OfficeScrape" "Invoke-OxidResolver" "Invoke-P0wnedshell" "Invoke-Paranoia" "Invoke-PortScan" "Invoke-PoshRatHttp" "Invoke-PostExfil" "Invoke-PowerDump" "Invoke-PowerDPAPI" "Invoke-PowerShellTCP" "Invoke-PowerShellWMI" "Invoke-PPLDump" "Invoke-PsExec" "Invoke-PSInject" "Invoke-PsUaCme" "Invoke-ReflectivePEInjection" "Invoke-ReverseDNSLookup" "Invoke-Rubeus" "Invoke-RunAs" "Invoke-SafetyKatz" "Invoke-SauronEye" "Invoke-SCShell" "Invoke-Seatbelt" "Invoke-ServiceAbuse" "Invoke-ShadowSpray" "Invoke-Sharp" "Invoke-Shellcode" "Invoke-SMBScanner" "Invoke-Snaffler" "Invoke-Spoolsample" "Invoke-SpraySinglePassword" "Invoke-SSHCommand" "Invoke-StandIn" "Invoke-StickyNotesExtract" "Invoke-SystemCommand" "Invoke-Tasksbackdoor" "Invoke-Tater" "Invoke-Thunderfox" "Invoke-ThunderStruck" "Invoke-TokenManipulation" "Invoke-Tokenvator" "Invoke-TotalExec" "Invoke-UrbanBishop" "Invoke-UserHunter" "Invoke-VoiceTroll" "Invoke-Whisker" "Invoke-WinEnum" "Invoke-winPEAS" "Invoke-WireTap" "Invoke-WmiCommand" "Invoke-WMIExec" "Invoke-WScriptBypassUAC" "Invoke-Zerologon" MailRaider "New-ADIDNSNode" "New-HoneyHash" "New-InMemoryModule" "New-SOASerialNumberArray" "Out-Minidump" PowerBreach "powercat " PowerUp PowerView "Remove-ADIDNSNode" "Remove-Update" "Rename-ADIDNSNode" "Revoke-ADIDNSPermission" "Set-ADIDNSNode" "Show-TargetScreen" "Start-CaptureServer" "Start-Dnscat2" "Start-WebcamRecorder" VolumeShadowCopyTools))) and not ((Event.EventData.ScriptBlockText:("Get-SystemDriveInfo" "C:\\ProgramData\\Amazon\\EC2-Windows\\Launch\\Module\\"))))
+  | table(Event.System.TimeCreated.SystemTime, Event.System.Computer, Event.System.Security.UserID, Event.System.EventID, Event.EventData.ScriptBlockText, Event.EventData.ScriptBlockId, Event.EventData.Path)
+time_range_s: 600
+run_frequency_s: 300
+event_sink_keys:
+  - "high_severity_alerts"
+tags:
+  - "attack.execution"
+  - "attack.discovery"
+  - "attack.t1482"
+  - "attack.t1087"
+  - "attack.t1087.001"
+  - "attack.t1087.002"
+  - "attack.t1069.001"
+  - "attack.t1069.002"
+  - "attack.t1069"
+  - "attack.t1059.001"
+tests:
+  - name: "Alerts on a matching event"
+    now_timestamp: "2026-09-22T00:10:00.000Z"
+    dataset_inline: |
+      {"@scnr.datetime": "2026-09-22T00:08:00.000Z", "Event.EventData.Path": "", "Event.EventData.ScriptBlockId": "5f1a1a3e-88b0-4e63-9f0b-6f2c2b0a1234", "Event.EventData.ScriptBlockText": "Add-Exfiltration", "Event.System.Channel": "Microsoft-Windows-PowerShell/Operational", "Event.System.Computer": "WKS-ENG-221.corp.scanner.dev", "Event.System.EventID": "4104", "Event.System.Security.UserID": "S-1-5-21-1111111111-2222222222-3333333333-1105"}
+    expected_detection_result: true
+  - name: "Does not alert on unrelated benign PowerShell activity"
+    now_timestamp: "2026-09-22T00:10:00.000Z"
+    dataset_inline: |
+      {"@scnr.datetime": "2026-09-22T00:08:00.000Z", "Event.EventData.Path": "", "Event.EventData.ScriptBlockId": "5f1a1a3e-88b0-4e63-9f0b-6f2c2b0a1234", "Event.EventData.ScriptBlockText": "Get-ChildItem -Path C:\\\\Users\\\\jdoe\\\\Documents | Sort-Object LastWriteTime | Select-Object -First 10", "Event.System.Channel": "Microsoft-Windows-PowerShell/Operational", "Event.System.Computer": "WKS-ENG-221.corp.scanner.dev", "Event.System.EventID": "4104", "Event.System.Security.UserID": "S-1-5-21-1111111111-2222222222-3333333333-1105"}
+    expected_detection_result: false

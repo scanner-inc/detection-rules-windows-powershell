@@ -1,0 +1,25 @@
+# schema: https://scanner.dev/schema/scanner-detection-rule.v1.json
+name: "Tamper Windows Defender - ScriptBlockLogging"
+description: "Detects PowerShell scripts attempting to disable scheduled scanning and other parts of Windows Defender ATP or set default actions to allow."
+severity: High
+query_text: |
+  (((Event.EventData.ScriptBlockText:("-dbaf $true" "-dbaf 1" "-dbm $true" "-dbm 1" "-dips $true" "-dips 1" "-DisableArchiveScanning $true" "-DisableArchiveScanning 1" "-DisableBehaviorMonitoring $true" "-DisableBehaviorMonitoring 1" "-DisableBlockAtFirstSeen $true" "-DisableBlockAtFirstSeen 1" "-DisableCatchupFullScan $true" "-DisableCatchupFullScan 1" "-DisableCatchupQuickScan $true" "-DisableCatchupQuickScan 1" "-DisableIntrusionPreventionSystem $true" "-DisableIntrusionPreventionSystem 1" "-DisableIOAVProtection $true" "-DisableIOAVProtection 1" "-DisableRealtimeMonitoring $true" "-DisableRealtimeMonitoring 1" "-DisableRemovableDriveScanning $true" "-DisableRemovableDriveScanning 1" "-DisableScanningMappedNetworkDrivesForFullScan $true" "-DisableScanningMappedNetworkDrivesForFullScan 1" "-DisableScanningNetworkFiles $true" "-DisableScanningNetworkFiles 1" "-DisableScriptScanning $true" "-DisableScriptScanning 1" "-MAPSReporting $false" "-MAPSReporting 0" "-drdsc $true" "-drdsc 1" "-drtm $true" "-drtm 1" "-dscrptsc $true" "-dscrptsc 1" "-dsmndf $true" "-dsmndf 1" "-dsnf $true" "-dsnf 1" "-dss $true" "-dss 1")) and Event.EventData.ScriptBlockText:"Set-MpPreference") or (Event.EventData.ScriptBlockText:"Set-MpPreference" and (Event.EventData.ScriptBlockText:("HighThreatDefaultAction Allow" "htdefac Allow" "LowThreatDefaultAction Allow" "ltdefac Allow" "ModerateThreatDefaultAction Allow" "mtdefac Allow" "SevereThreatDefaultAction Allow" "stdefac Allow"))))
+  | table(Event.System.TimeCreated.SystemTime, Event.System.Computer, Event.System.Security.UserID, Event.System.EventID, Event.EventData.ScriptBlockText, Event.EventData.ScriptBlockId, Event.EventData.Path)
+time_range_s: 600
+run_frequency_s: 300
+event_sink_keys:
+  - "high_severity_alerts"
+tags:
+  - "attack.defense-impairment"
+  - "attack.t1685"
+tests:
+  - name: "Alerts on a matching event"
+    now_timestamp: "2026-09-22T00:10:00.000Z"
+    dataset_inline: |
+      {"@scnr.datetime": "2026-09-22T00:08:00.000Z", "Event.EventData.Path": "", "Event.EventData.ScriptBlockId": "5f1a1a3e-88b0-4e63-9f0b-6f2c2b0a1234", "Event.EventData.ScriptBlockText": "-dbaf $true; Set-MpPreference", "Event.System.Channel": "Microsoft-Windows-PowerShell/Operational", "Event.System.Computer": "WKS-ENG-221.corp.scanner.dev", "Event.System.EventID": "4104", "Event.System.Security.UserID": "S-1-5-21-1111111111-2222222222-3333333333-1105"}
+    expected_detection_result: true
+  - name: "Does not alert on unrelated benign PowerShell activity"
+    now_timestamp: "2026-09-22T00:10:00.000Z"
+    dataset_inline: |
+      {"@scnr.datetime": "2026-09-22T00:08:00.000Z", "Event.EventData.Path": "", "Event.EventData.ScriptBlockId": "5f1a1a3e-88b0-4e63-9f0b-6f2c2b0a1234", "Event.EventData.ScriptBlockText": "Get-ChildItem -Path C:\\\\Users\\\\jdoe\\\\Documents | Sort-Object LastWriteTime | Select-Object -First 10", "Event.System.Channel": "Microsoft-Windows-PowerShell/Operational", "Event.System.Computer": "WKS-ENG-221.corp.scanner.dev", "Event.System.EventID": "4104", "Event.System.Security.UserID": "S-1-5-21-1111111111-2222222222-3333333333-1105"}
+    expected_detection_result: false

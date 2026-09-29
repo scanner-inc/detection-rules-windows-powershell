@@ -3,7 +3,7 @@ name: "Alternate PowerShell Hosts - PowerShell Module"
 description: "Detects alternate PowerShell hosts potentially bypassing detections looking for powershell.exe"
 severity: Medium
 query_text: |
-  ((Event.EventData.ContextInfo:*) and not (Event.EventData.ContextInfo:"C:\\Windows\\system32\\dsac.exe" or Event.EventData.ContextInfo:"ConfigSyncRun.exe" or (Event.EventData.Payload:"Update-Help" or Event.EventData.Payload:"Failed to update Help for the module") or (Event.EventData.ContextInfo:"= powershell" or Event.EventData.ContextInfo:"= C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\powershell" or Event.EventData.ContextInfo:"= C:\\Windows\\SysWOW64\\WindowsPowerShell\\v1.0\\powershell" or Event.EventData.ContextInfo:"= C:/Windows/System32/WindowsPowerShell/v1.0/powershell" or Event.EventData.ContextInfo:"= C:/Windows/SysWOW64/WindowsPowerShell/v1.0/powershell" or Event.EventData.ContextInfo:"= \\\\\\?\\?\\C:Windows\\System32\\WindowsPowerShell\\v1.0\\powershell" or Event.EventData.ContextInfo:"= \\\\\\?\\?\\C:Windows\\SysWOW64\\WindowsPowerShell\\v1.0\\powershell") or Event.EventData.ContextInfo:"= C:\\WINDOWS\\System32\\sdiagnhost.exe -Embedding" or Event.EventData.ContextInfo:"C:\\Windows\\system32\\wsmprovhost.exe -Embedding"))
+  ((Event.EventData.ContextInfo:*) and not (Event.EventData.ContextInfo:("C:\\Windows\\system32\\dsac.exe" "ConfigSyncRun.exe") or (Event.EventData.Payload:("Update-Help" "Failed to update Help for the module")) or (Event.EventData.ContextInfo:("= powershell" "= C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\powershell" "= C:\\Windows\\SysWOW64\\WindowsPowerShell\\v1.0\\powershell" "= C:/Windows/System32/WindowsPowerShell/v1.0/powershell" "= C:/Windows/SysWOW64/WindowsPowerShell/v1.0/powershell" "= \\\\\\?\\?\\C:Windows\\System32\\WindowsPowerShell\\v1.0\\powershell" "= \\\\\\?\\?\\C:Windows\\SysWOW64\\WindowsPowerShell\\v1.0\\powershell")) or Event.EventData.ContextInfo:("= C:\\WINDOWS\\System32\\sdiagnhost.exe -Embedding" "C:\\Windows\\system32\\wsmprovhost.exe -Embedding")))
   | table(Event.System.TimeCreated.SystemTime, Event.System.Computer, Event.System.Security.UserID, Event.System.EventID, Event.EventData.Payload, Event.EventData.ContextInfo)
 time_range_s: 600
 run_frequency_s: 300
@@ -12,3 +12,14 @@ event_sink_keys:
 tags:
   - "attack.execution"
   - "attack.t1059.001"
+tests:
+  - name: "Alerts on a matching event"
+    now_timestamp: "2026-09-22T00:10:00.000Z"
+    dataset_inline: |
+      {"@scnr.datetime": "2026-09-22T00:08:00.000Z", "Event.EventData.ContextInfo": "= C:\\Tools\\ThirdPartyShell\\shell.exe", "Event.System.Channel": "Microsoft-Windows-PowerShell/Operational", "Event.System.Computer": "WKS-ENG-221.corp.scanner.dev", "Event.System.EventID": "4103", "Event.System.Security.UserID": "S-1-5-21-1111111111-2222222222-3333333333-1105"}
+    expected_detection_result: true
+  - name: "Does not alert on unrelated benign PowerShell activity"
+    now_timestamp: "2026-09-22T00:10:00.000Z"
+    dataset_inline: |
+      {"@scnr.datetime": "2026-09-22T00:08:00.000Z", "Event.System.Channel": "Microsoft-Windows-PowerShell/Operational", "Event.System.Computer": "WKS-ENG-221.corp.scanner.dev", "Event.System.EventID": "4103", "Event.System.Security.UserID": "S-1-5-21-1111111111-2222222222-3333333333-1105"}
+    expected_detection_result: false

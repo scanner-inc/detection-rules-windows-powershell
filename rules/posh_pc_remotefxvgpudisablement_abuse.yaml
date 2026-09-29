@@ -12,3 +12,14 @@ event_sink_keys:
 tags:
   - "attack.stealth"
   - "attack.t1218"
+tests:
+  - name: "Alerts on a matching event"
+    now_timestamp: "2026-09-22T00:10:00.000Z"
+    dataset_inline: |
+      {"@scnr.datetime": "2026-09-22T00:08:00.000Z", "Event.EventData.Data": "ModuleContents=function Get-VMRemoteFXPhysicalVideoAdapter {", "Event.System.Channel": "Windows PowerShell", "Event.System.Computer": "WKS-ENG-221.corp.scanner.dev", "Event.System.EventID": "800", "Event.System.Security.UserID": "S-1-5-21-1111111111-2222222222-3333333333-1105"}
+    expected_detection_result: true
+  - name: "Does not alert on unrelated benign PowerShell activity"
+    now_timestamp: "2026-09-22T00:10:00.000Z"
+    dataset_inline: |
+      {"@scnr.datetime": "2026-09-22T00:08:00.000Z", "Event.EventData.Data": "HostApplication=powershell.exe -Command \"Get-ChildItem C:\\\\Users\\\\jdoe\\\\Documents\" EngineVersion=5.1.19041.1 HostVersion=5.1.19041.1 HostName=ConsoleHost", "Event.System.Channel": "Windows PowerShell", "Event.System.Computer": "WKS-ENG-221.corp.scanner.dev", "Event.System.EventID": "800", "Event.System.Security.UserID": "S-1-5-21-1111111111-2222222222-3333333333-1105"}
+    expected_detection_result: false

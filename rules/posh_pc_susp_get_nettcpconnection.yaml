@@ -13,3 +13,21 @@ event_sink_keys:
 tags:
   - "attack.discovery"
   - "attack.t1049"
+tests:
+  - name: "Alerts when the same user/host repeats the activity more than 4 times within the lookback window"
+    now_timestamp: "2026-09-22T00:10:00.000Z"
+    dataset_inline: |
+      {"@scnr.datetime": "2026-09-22T00:00:00.000Z", "Event.EventData.Data": "Get-NetTCPConnection", "Event.System.Channel": "Windows PowerShell", "Event.System.Computer": "WKS-ENG-221.corp.scanner.dev", "Event.System.EventID": "800", "Event.System.Security.UserID": "S-1-5-21-1111111111-2222222222-3333333333-1105"}
+      {"@scnr.datetime": "2026-09-22T00:02:00.000Z", "Event.EventData.Data": "Get-NetTCPConnection", "Event.System.Channel": "Windows PowerShell", "Event.System.Computer": "WKS-ENG-221.corp.scanner.dev", "Event.System.EventID": "800", "Event.System.Security.UserID": "S-1-5-21-1111111111-2222222222-3333333333-1105"}
+      {"@scnr.datetime": "2026-09-22T00:04:00.000Z", "Event.EventData.Data": "Get-NetTCPConnection", "Event.System.Channel": "Windows PowerShell", "Event.System.Computer": "WKS-ENG-221.corp.scanner.dev", "Event.System.EventID": "800", "Event.System.Security.UserID": "S-1-5-21-1111111111-2222222222-3333333333-1105"}
+      {"@scnr.datetime": "2026-09-22T00:06:00.000Z", "Event.EventData.Data": "Get-NetTCPConnection", "Event.System.Channel": "Windows PowerShell", "Event.System.Computer": "WKS-ENG-221.corp.scanner.dev", "Event.System.EventID": "800", "Event.System.Security.UserID": "S-1-5-21-1111111111-2222222222-3333333333-1105"}
+      {"@scnr.datetime": "2026-09-22T00:08:00.000Z", "Event.EventData.Data": "Get-NetTCPConnection", "Event.System.Channel": "Windows PowerShell", "Event.System.Computer": "WKS-ENG-221.corp.scanner.dev", "Event.System.EventID": "800", "Event.System.Security.UserID": "S-1-5-21-1111111111-2222222222-3333333333-1105"}
+    expected_detection_result: true
+  - name: "Does not alert when the count stays at the 4-occurrence threshold (not exceeding it)"
+    now_timestamp: "2026-09-22T00:10:00.000Z"
+    dataset_inline: |
+      {"@scnr.datetime": "2026-09-22T00:02:00.000Z", "Event.EventData.Data": "Get-NetTCPConnection", "Event.System.Channel": "Windows PowerShell", "Event.System.Computer": "WKS-ENG-221.corp.scanner.dev", "Event.System.EventID": "800", "Event.System.Security.UserID": "S-1-5-21-1111111111-2222222222-3333333333-1105"}
+      {"@scnr.datetime": "2026-09-22T00:04:00.000Z", "Event.EventData.Data": "Get-NetTCPConnection", "Event.System.Channel": "Windows PowerShell", "Event.System.Computer": "WKS-ENG-221.corp.scanner.dev", "Event.System.EventID": "800", "Event.System.Security.UserID": "S-1-5-21-1111111111-2222222222-3333333333-1105"}
+      {"@scnr.datetime": "2026-09-22T00:06:00.000Z", "Event.EventData.Data": "Get-NetTCPConnection", "Event.System.Channel": "Windows PowerShell", "Event.System.Computer": "WKS-ENG-221.corp.scanner.dev", "Event.System.EventID": "800", "Event.System.Security.UserID": "S-1-5-21-1111111111-2222222222-3333333333-1105"}
+      {"@scnr.datetime": "2026-09-22T00:08:00.000Z", "Event.EventData.Data": "Get-NetTCPConnection", "Event.System.Channel": "Windows PowerShell", "Event.System.Computer": "WKS-ENG-221.corp.scanner.dev", "Event.System.EventID": "800", "Event.System.Security.UserID": "S-1-5-21-1111111111-2222222222-3333333333-1105"}
+    expected_detection_result: false

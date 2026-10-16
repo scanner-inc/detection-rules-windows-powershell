@@ -3,7 +3,7 @@ name: "Remote PowerShell Session (PS Module)"
 description: "Detects remote PowerShell sessions"
 severity: High
 query_text: |
-  (((Event.EventData.ContextInfo:" = ServerRemoteHost " and Event.EventData.ContextInfo:"wsmprovhost.exe")) and not (Event.EventData.ContextInfo:"\\Windows\\system32\\WindowsPowerShell\\v1.0\\Modules\\Microsoft.PowerShell.Archive\\Microsoft.PowerShell.Archive.psm1"))
+  (((Event.EventData.ContextInfo:' = ServerRemoteHost ' and Event.EventData.ContextInfo:'wsmprovhost.exe')) and not (Event.EventData.ContextInfo:'\\Windows\\system32\\WindowsPowerShell\\v1.0\\Modules\\Microsoft.PowerShell.Archive\\Microsoft.PowerShell.Archive.psm1'))
   | table(Event.System.TimeCreated.SystemTime, Event.System.Computer, Event.System.Security.UserID, Event.System.EventID, Event.EventData.Payload, Event.EventData.ContextInfo)
 time_range_s: 600
 run_frequency_s: 300
@@ -20,6 +20,16 @@ tests:
     dataset_inline: |
       {"@scnr.datetime": "2026-09-22T00:08:00.000Z", "Event.EventData.ContextInfo": " = ServerRemoteHost ; wsmprovhost.exe", "Event.System.Channel": "Microsoft-Windows-PowerShell/Operational", "Event.System.Computer": "WKS-ENG-221.corp.scanner.dev", "Event.System.EventID": "4103", "Event.System.Security.UserID": "S-1-5-21-1111111111-2222222222-3333333333-1105"}
     expected_detection_result: true
+  - name: "Alerts on a case-variant of the matching event (matching is case-insensitive)"
+    now_timestamp: "2026-09-22T00:10:00.000Z"
+    dataset_inline: |
+      {"@scnr.datetime": "2026-09-22T00:08:00.000Z", "Event.EventData.ContextInfo": " = SERVERREMOTEHOST ; WSMPROVHOST.EXE", "Event.System.Channel": "Microsoft-Windows-PowerShell/Operational", "Event.System.Computer": "WKS-ENG-221.corp.scanner.dev", "Event.System.EventID": "4103", "Event.System.Security.UserID": "S-1-5-21-1111111111-2222222222-3333333333-1105"}
+    expected_detection_result: true
+  - name: "Does not alert when the rule's exclusion applies (exclusion is case-insensitive)"
+    now_timestamp: "2026-09-22T00:10:00.000Z"
+    dataset_inline: |
+      {"@scnr.datetime": "2026-09-22T00:08:00.000Z", "Event.EventData.ContextInfo": " = SERVERREMOTEHOST ; WSMPROVHOST.EXE; \\WINDOWS\\SYSTEM32\\WINDOWSPOWERSHELL\\V1.0\\MODULES\\MICROSOFT.POWERSHELL.ARCHIVE\\MICROSOFT.POWERSHELL.ARCHIVE.PSM1", "Event.System.Channel": "Microsoft-Windows-PowerShell/Operational", "Event.System.Computer": "WKS-ENG-221.corp.scanner.dev", "Event.System.EventID": "4103", "Event.System.Security.UserID": "S-1-5-21-1111111111-2222222222-3333333333-1105"}
+    expected_detection_result: false
   - name: "Does not alert on unrelated benign PowerShell activity"
     now_timestamp: "2026-09-22T00:10:00.000Z"
     dataset_inline: |
